@@ -1,0 +1,23 @@
+# Rust / Tauri
+target/
+src-tauri/target/
+Cargo.lock
+
+# Node
+node_modules/
+dist/
+
+# macOS
+.DS_Store
+*.dmg
+
+# Build artifacts
+src-tauri/gen/
+
+# Plugin snapshot (populated by scripts/sync-plugin.sh at release time)
+# Keep the directory, ignore its contents
+plugin/*
+!plugin/.gitkeep
+
+# Tauri build output
+src-tauri/WixTools/
