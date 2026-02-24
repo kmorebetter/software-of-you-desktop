@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Software of You</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <div id="panels">
+      <!-- Terminal Panel (60%) -->
+      <div id="terminal-panel">
+        <div id="terminal"></div>
+      </div>
+
+      <!-- Resizable Divider -->
+      <div id="divider"></div>
+
+      <!-- Preview Panel (40%) -->
+      <div id="preview-panel">
+        <div id="preview-header">
+          <span id="preview-filename">Preview</span>
+          <button id="reload-preview" title="Reload preview">&#x21bb;</button>
+        </div>
+        <iframe id="preview-frame" class="hidden" sandbox="allow-scripts allow-same-origin"></iframe>
+        <div id="preview-empty">
+          <span>No views yet &mdash; run a command in the terminal</span>
+        </div>
+
+        <!-- Recents Drawer -->
+        <button id="recents-toggle">
+          <span>&#x25b6;</span>
+          <span>Recent views</span>
+        </button>
+        <div id="recents-drawer">
+          <ul id="recents-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div id="status-bar">
+      <div id="status-left">
+        <span id="pty-status-dot" class="status-dot stopped"></span>
+        <span id="pty-status-text">stopped</span>
+        <span id="pty-dimensions"></span>
+      </div>
+      <div id="status-right">
+        <span id="view-info"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onboarding Overlay (hidden by default) -->
+  <div id="onboarding-screen" style="display: none;">
+    <div id="onboarding-card">
+      <div id="step-indicators">
+        <span class="step-dot active"></span>
+        <span class="step-dot"></span>
+      </div>
+      <div class="status-icon" id="onboarding-icon"></div>
+      <h2 id="onboarding-title">Welcome to Software of You</h2>
+
+      <!-- Step 1: Find Claude Code -->
+      <div id="step-1-content">
+        <p id="onboarding-body">Detecting Claude Code installation...</p>
+      </div>
+
+      <!-- Step 2: Extract Plugin & Bootstrap -->
+      <div id="step-2-content" style="display: none;">
+        <div id="bootstrap-log"></div>
+      </div>
+
+      <div id="onboarding-actions" style="margin-top: 24px; display: flex; gap: 12px; justify-content: center;"></div>
+    </div>
+  </div>
+
+  <script type="module" src="terminal.js"></script>
+  <script type="module" src="preview.js"></script>
+  <script type="module" src="onboarding.js"></script>
+</body>
+</html>

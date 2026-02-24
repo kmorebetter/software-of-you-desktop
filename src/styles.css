@@ -1,0 +1,456 @@
+/* ============================================================
+   Software of You — Desktop App Styles
+   Dark theme for Tauri 2.x macOS app
+   ============================================================ */
+
+/* --- Reset & Base --- */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: #0f1117;
+  color: #e2e8f0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- App Layout --- */
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+#panels {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* --- Terminal Panel --- */
+
+#terminal-panel {
+  width: 60%;
+  min-width: 0;
+  background: #0f1117;
+  overflow: hidden;
+}
+
+#terminal {
+  width: 100%;
+  height: 100%;
+}
+
+/* --- Divider --- */
+
+#divider {
+  width: 4px;
+  background: #2d3748;
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+#divider:hover {
+  background: #f97316;
+}
+
+/* --- Preview Panel --- */
+
+#preview-panel {
+  width: 40%;
+  background: #1a1f2e;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#preview-header {
+  height: 40px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #2d3748;
+  font-size: 13px;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+#preview-frame {
+  flex: 1;
+  border: none;
+  width: 100%;
+  background: #fff;
+}
+
+#preview-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-size: 14px;
+  text-align: center;
+  padding: 40px;
+}
+
+#reload-preview {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+#reload-preview:hover {
+  color: #e2e8f0;
+}
+
+/* --- Recents Drawer --- */
+
+#recents-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  border-top: 1px solid #2d3748;
+  color: #94a3b8;
+  font-size: 12px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+#recents-toggle:hover {
+  color: #e2e8f0;
+}
+
+#recents-drawer {
+  max-height: 180px;
+  overflow-y: auto;
+  border-top: 1px solid #2d3748;
+  display: none;
+}
+
+#recents-drawer.open {
+  display: block;
+}
+
+#recents-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#recents-list li {
+  padding: 6px 12px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  cursor: pointer;
+  color: #94a3b8;
+  transition: background 0.15s, color 0.15s;
+}
+
+#recents-list li:hover {
+  background: rgba(249, 115, 22, 0.1);
+  color: #e2e8f0;
+}
+
+.recents-time {
+  font-size: 11px;
+  color: #64748b;
+}
+
+/* --- Status Bar --- */
+
+#status-bar {
+  height: 28px;
+  background: #0a0d14;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 12px;
+  color: #94a3b8;
+  border-top: 1px solid #2d3748;
+  flex-shrink: 0;
+}
+
+#status-left,
+#status-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.running {
+  background: #48bb78;
+}
+
+.status-dot.stopped {
+  background: #fc8181;
+}
+
+.status-dot.starting {
+  background: #f6e05e;
+}
+
+/* --- Onboarding Overlay --- */
+
+#onboarding-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+#onboarding-card {
+  background: #1a1f2e;
+  border-radius: 12px;
+  padding: 40px;
+  width: 480px;
+  max-width: 90vw;
+  text-align: center;
+}
+
+#step-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2d3748;
+  transition: background 0.2s;
+}
+
+.step-dot.active {
+  background: #f97316;
+}
+
+.step-dot.completed {
+  background: #48bb78;
+}
+
+#onboarding-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+#bootstrap-log {
+  background: #0f1117;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 16px 0;
+  max-height: 200px;
+  overflow-y: auto;
+  text-align: left;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+/* --- Buttons --- */
+
+.btn-primary {
+  background: #f97316;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover {
+  background: #ea580c;
+}
+
+.btn-secondary {
+  background: #2d3748;
+  color: #e2e8f0;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-secondary:hover {
+  background: #374151;
+}
+
+/* --- Status Icons (Onboarding Steps) --- */
+
+.status-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.status-icon.success {
+  color: #48bb78;
+}
+
+.status-icon.error {
+  color: #fc8181;
+}
+
+.status-icon.loading {
+  color: #f97316;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* --- Scrollbar (WebKit) --- */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2d3748;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4a5568;
+}
+
+/* --- Onboarding Result Styles --- */
+
+.onboarding-result {
+  margin: 16px 0;
+}
+
+.result-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.success-icon {
+  color: #48bb78;
+}
+
+.error-icon {
+  color: #fc8181;
+}
+
+.result-text {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.result-detail {
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.result-detail.muted {
+  color: #94a3b8;
+}
+
+.result-detail a,
+.help-link {
+  color: #f97316;
+  text-decoration: none;
+}
+
+.result-detail a:hover,
+.help-link:hover {
+  text-decoration: underline;
+}
+
+.manual-path-input {
+  margin-top: 16px;
+  text-align: left;
+}
+
+.manual-path-input label {
+  display: block;
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 8px;
+}
+
+.manual-path-input input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #0f1117;
+  border: 1px solid #2d3748;
+  border-radius: 6px;
+  color: #e2e8f0;
+  font-family: "JetBrains Mono", "SF Mono", monospace;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.manual-path-input input:focus {
+  outline: none;
+  border-color: #f97316;
+}
+
+.onboarding-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+#onboarding-body {
+  color: #94a3b8;
+  margin-bottom: 16px;
+}
+
+/* --- Utility --- */
+
+.hidden {
+  display: none !important;
+}
