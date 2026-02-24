@@ -34,6 +34,8 @@ impl Default for PtyState {
 pub fn pty_start(
     project_path: String,
     path_env: String,
+    cols: u16,
+    rows: u16,
     app_handle: tauri::AppHandle,
     state: tauri::State<'_, Mutex<PtyState>>,
 ) -> Result<(), String> {
@@ -56,8 +58,8 @@ pub fn pty_start(
     let pty_system = portable_pty::native_pty_system();
 
     let size = PtySize {
-        rows: 50,
-        cols: 220,
+        rows: if rows > 0 { rows } else { 24 },
+        cols: if cols > 0 { cols } else { 80 },
         pixel_width: 0,
         pixel_height: 0,
     };

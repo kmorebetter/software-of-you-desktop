@@ -17,6 +17,45 @@ fn plugin_dest() -> Result<PathBuf, String> {
         .ok_or_else(|| "Could not determine data directory".to_string())
 }
 
+/// Find the plugin source directory. Checks the Tauri resource dir first (bundled app),
+/// then falls back to the project-relative `plugin/` directory (dev mode).
+fn find_plugin_source(app_handle: &AppHandle) -> Result<PathBuf, String> {
+    // Bundled mode: resource_dir/plugin
+    if let Ok(res_dir) = app_handle.path().resource_dir() {
+        let bundled = res_dir.join("plugin");
+        if bundled.exists() && bundled.join("VERSION").exists() {
+            return Ok(bundled);
+        }
+    }
+
+    // Dev mode: look relative to the binary's ancestor directories for plugin/
+    if let Ok(exe) = std::env::current_exe() {
+        // Walk up from the binary location looking for plugin/VERSION
+        let mut dir = exe.parent().map(|p| p.to_path_buf());
+        for _ in 0..10 {
+            if let Some(ref d) = dir {
+                let candidate = d.join("plugin");
+                if candidate.join("VERSION").exists() {
+                    return Ok(candidate);
+                }
+                dir = d.parent().map(|p| p.to_path_buf());
+            } else {
+                break;
+            }
+        }
+    }
+
+    // Last resort: current working directory
+    if let Ok(cwd) = std::env::current_dir() {
+        let candidate = cwd.join("plugin");
+        if candidate.join("VERSION").exists() {
+            return Ok(candidate);
+        }
+    }
+
+    Err("Plugin source not found. Ensure plugin/ directory exists with a VERSION file.".to_string())
+}
+
 fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<(), String> {
     fs::create_dir_all(dst).map_err(|e| format!("Failed to create dir {}: {}", dst.display(), e))?;
 
@@ -116,18 +155,7 @@ pub fn run_onboarding_step2(
     app_handle: AppHandle,
 ) -> Result<(), String> {
     let dest = plugin_dest()?;
-    let source = app_handle
-        .path()
-        .resource_dir()
-        .map_err(|e| e.to_string())?
-        .join("plugin");
-
-    if !source.exists() {
-        return Err(format!(
-            "Bundled plugin not found at {}",
-            source.display()
-        ));
-    }
+    let source = find_plugin_source(&app_handle)?;
 
     copy_dir_recursive(&source, &dest)?;
 
@@ -203,11 +231,10 @@ pub fn run_onboarding_step2(
 
 pub fn extract_plugin_if_needed(app_handle: &AppHandle) -> Result<PathBuf, String> {
     let dest = plugin_dest()?;
-    let source = app_handle
-        .path()
-        .resource_dir()
-        .map_err(|e| e.to_string())?
-        .join("plugin");
+    let source = match find_plugin_source(app_handle) {
+        Ok(s) => s,
+        Err(_) => return Ok(dest), // No plugin source found — skip extraction silently
+    };
 
     let bundle_version = fs::read_to_string(source.join("VERSION"))
         .unwrap_or_default()

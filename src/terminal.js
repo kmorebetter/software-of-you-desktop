@@ -8,6 +8,11 @@ import { listen } from '@tauri-apps/api/event';
 let term;
 let fitAddon;
 let ptyStarted = false;
+let initialized = false;
+
+// Store unlisten functions so we can clean up on HMR reload
+let unlistenPtyOutput = null;
+let unlistenMenuAction = null;
 
 function updateDimensions() {
   const dims = document.getElementById('pty-dimensions');
@@ -30,12 +35,9 @@ async function startPty() {
     setStatus('starting', 'starting...');
     const config = await invoke('get_config');
 
-    // Use the discovered claude_path from config, or fall back to bare "claude"
     const claudePath = config.claude_path || 'claude';
     const pluginPath = config.plugin_path_override || config.plugin_path;
 
-    // Build a PATH that includes the directory where claude lives
-    // This is critical for macOS .app bundles which have a restricted default PATH
     let pathEnv = '';
     if (claudePath && claudePath.includes('/')) {
       const claudeDir = claudePath.substring(0, claudePath.lastIndexOf('/'));
@@ -43,13 +45,21 @@ async function startPty() {
       pathEnv = `${claudeDir}:${defaultPath}`;
     }
 
+    // Ensure layout is settled and fit is current before reading dimensions
+    fitAddon.fit();
+
     await invoke('pty_start', {
       projectPath: pluginPath,
       pathEnv,
+      cols: term.cols,
+      rows: term.rows,
     });
 
     ptyStarted = true;
     setStatus('running', 'claude');
+
+    // Send an immediate resize to guarantee PTY matches xterm after start
+    await invoke('pty_resize', { cols: term.cols, rows: term.rows }).catch(() => {});
     updateDimensions();
     term.focus();
   } catch (err) {
@@ -59,6 +69,10 @@ async function startPty() {
 }
 
 async function initTerminal() {
+  // Guard against double init from HMR
+  if (initialized) return;
+  initialized = true;
+
   term = new Terminal({
     fontFamily: '"JetBrains Mono", "SF Mono", monospace',
     fontSize: 13,
@@ -70,7 +84,7 @@ async function initTerminal() {
       selectionBackground: 'rgba(249, 115, 22, 0.3)',
     },
     scrollback: 10000,
-    convertEol: true,
+    convertEol: false,
     cursorBlink: true,
     cursorStyle: 'bar',
   });
@@ -98,12 +112,15 @@ async function initTerminal() {
   });
   ro.observe(document.getElementById('terminal'));
 
-  listen('pty-output', (event) => {
+  // Clean up old listeners if they exist (HMR safety)
+  if (unlistenPtyOutput) unlistenPtyOutput();
+  if (unlistenMenuAction) unlistenMenuAction();
+
+  unlistenPtyOutput = await listen('pty-output', (event) => {
     term.write(event.payload);
   });
 
-  // Handle menu bar actions from Rust
-  listen('menu-action', (event) => {
+  unlistenMenuAction = await listen('menu-action', (event) => {
     switch (event.payload) {
       case 'clear-terminal':
         term.clear();
@@ -158,8 +175,6 @@ async function initTerminal() {
     if (status.onboarding_complete) {
       await startPty();
     }
-    // If onboarding not complete, the onboarding.js flow will handle it
-    // and the PTY will be started when onboarding completes (via startPtyAfterOnboarding)
   } catch (err) {
     console.error('Failed to check setup:', err);
   }
@@ -167,7 +182,6 @@ async function initTerminal() {
 
 document.addEventListener('DOMContentLoaded', initTerminal);
 
-// Called by onboarding.js after onboarding completes
 export async function startPtyAfterOnboarding() {
   await startPty();
 }

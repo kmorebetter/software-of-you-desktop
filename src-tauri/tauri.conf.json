@@ -32,11 +32,7 @@
     "resources": ["../plugin/**/*"],
     "macOS": {
       "minimumSystemVersion": "13.0",
-      "entitlements": "./entitlements.plist",
-      "infoPlist": {
-        "CFBundleDisplayName": "Software of You",
-        "CFBundleName": "SoY"
-      }
+      "entitlements": "./entitlements.plist"
     }
   }
 }

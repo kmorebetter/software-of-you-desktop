@@ -98,12 +98,8 @@ fn setup_menu(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     // Window submenu
     let minimize = PredefinedMenuItem::minimize(handle, Some("Minimize"))?;
     let zoom = PredefinedMenuItem::fullscreen(handle, Some("Zoom"))?;
-    let separator5 = PredefinedMenuItem::separator(handle)?;
-    let bring_all =
-        PredefinedMenuItem::bring_all_to_front(handle, Some("Bring All to Front"))?;
-
     let window_menu = SubmenuBuilder::new(handle, "Window")
-        .items(&[&minimize, &zoom, &separator5, &bring_all])
+        .items(&[&minimize, &zoom])
         .build()?;
 
     // Build full menu
